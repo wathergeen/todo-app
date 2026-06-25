@@ -1,0 +1,105 @@
+Aqui está a Descrição Preliminar de Projeto estruturada em formato de texto para fácil leitura e cópia, adaptada exatamente para o escopo do aplicativo Todo List móvel e mantendo o reaproveitamento das rotas do seu back-end em Flask:
+
+Descrição Preliminar de Projeto: Sistema Todo List
+Este documento apresenta a especificação inicial, os padrões de integração e os requisitos de arquitetura para o desenvolvimento do aplicativo móvel de lista de tarefas (Todo List), projetado para consumir um back-end existente em Flask.
+
+1. Arquitetura do Sistema
+O sistema adota o modelo de Arquitetura Cliente-Servidor Desacoplada. A comunicação entre as duas frentes ocorre exclusivamente por meio de uma API RESTful, utilizando requisições HTTP assíncronas com transferência de dados estruturados em formato JSON.
+
+Back-end (Servidor): Funciona como uma camada de serviços stateless (sem retenção de estado de sessão tradicional), responsável pelas regras de negócio, autenticação/criptografia de dados e persistência.
+
+Front-end (Cliente Móvel): Camada de apresentação rica desenvolvida para dispositivos móveis, responsável pela gestão de estado local na interface e pela aplicação de atualizações otimistas.
+
+2. Plataforma Tecnológica
+A infraestrutura tecnológica e o ecossistema homologado para o funcionamento do projeto são compostos por:
+
+Linguagem do Servidor: Python 3.x
+
+Framework Web (Back-end): Flask (utilizado estritamente para a entrega dos endpoints da API).
+
+Auxiliares de Interface (Painel Interno): Jinja 2 e Bootstrap (utilizados opcionalmente apenas para páginas internas de documentação da API ou telas de administração do sistema).
+
+Banco de Dados: SQLite (persistência relacional simplificada, ideal para o escopo de listas de tarefas).
+
+Ambiente de Execução: Contêiner Docker, garantindo que o ambiente do servidor seja idêntico em qualquer máquina de desenvolvimento.
+
+Controle de Versão: Git e GitHub, com o versionamento integrado diretamente ao ambiente do contêiner e conectado a uma conta online para salvamento seguro.
+
+Framework Mobile (Front-end): Flutter (Dart) para geração do aplicativo nativo (Android e iOS).
+
+3. Estrutura de Diretórios (Padrão Monorepo)
+Para unificar o repositório e facilitar a integração contínua, o projeto utilizará a seguinte árvore de pastas:
+
+Plaintext
+todo-list-project/
+│
+├── .github/                  # Configurações de automação e CI/CD do GitHub
+├── README.md                 # Instruções gerais de inicialização do projeto
+│
+├── backend/                  # Módulo do Servidor (Flask + SQLite)
+│   ├── Dockerfile            # Arquivo de configuração do contêiner Docker
+│   ├── requirements.txt      # Dependências e bibliotecas Python
+│   ├── app.py                # Inicialização da API Flask
+│   ├── config.py             # Parâmetros de ambiente e banco de dados
+│   ├── models.py             # Estrutura das tabelas (Usuário, Tarefa, Listas)
+│   ├── routes/               # Divisão das rotas por contexto (Autenticação e Tarefas)
+│   ├── static/               # Arquivos Bootstrap para o painel de suporte
+│   └── templates/            # Telas em Jinja2 para visualização interna da API
+│
+└── frontend/                 # Módulo do Aplicativo Móvel (Flutter)
+    ├── pubspec.yaml          # Dependências do Flutter (Dio, gerenciadores de estado)
+    └── lib/                  # Código-fonte em Dart
+        ├── main.dart         # Ponto de partida do app
+        ├── models/           # Espelhamento das tabelas em objetos Dart
+        ├── services/         # KanbanService (Encapsulamento de chamadas HTTP)
+        ├── view_models/      # Gerenciamento de estado e regras da UI
+        └── views/            # Telas e widgets do aplicativo (Login, Listas, Itens)
+4. Convenções do Projeto
+A fim de garantir harmonia no desenvolvimento utilizando duas linguagens distintas (Python e Dart), aplicam-se as seguintes diretrizes:
+
+Estilo de Código Back-end: Seguir a PEP 8 (Python). Variáveis, funções e rotas em snake_case; classes em PascalCase.
+
+Estilo de Código Front-end: Seguir as diretrizes oficiais do Dart/Flutter. Variáveis e métodos em camelCase; classes em PascalCase; nomes de arquivos em snake_case.
+
+Padronização de JSON: Todos os payloads de rede trafegados em formato JSON utilizarão chaves em snake_case (ex: column_id, password_hash).
+
+Padronização de Datas: Todas as marcações temporais de criação ou modificação de tarefas devem seguir estritamente a norma ISO 8601 no fuso horário UTC (YYYY-MM-DDTHH:mm:ssZ).
+
+5. Serviços e Integração (Contrato da API)
+Embora visualmente a interface opere no formato clássico de um Todo List (onde as colunas originais passam a atuar como "Categorias", "Status" ou "Listas" — como A Fazer, Em Progresso, Concluído), o back-end em Flask mantém sua modelagem relacional intacta.
+
+5.1. Tabela de Endpoints
+POST /api/register
+
+Descrição: Cadastra um novo usuário no sistema. Recebe username e password em texto limpo e armazena o hash criptografado no SQLite.
+
+POST /api/login
+
+Descrição: Valida as credenciais. Se corretas, gera e retorna o token de acesso/sessão para o Flutter.
+
+GET /api/board
+
+Descrição: Retorna a estrutura completa do Todo List (o array de listas/status contendo seus respectivos arrays de tarefas) pertencente ao usuário autenticado.
+
+POST /api/tasks
+
+Descrição: Cria uma nova tarefa na lista especificada.
+
+Payload esperado: {"title": string, "column_id": number, "description": string}
+
+PATCH /api/tasks/<id>
+
+Descrição: Gerencia a reordenação e a mudança de status da tarefa de forma dinâmica. O back-end recebe a nova lista e a nova posição (0..n) e reordena os demais registros vizinhos automaticamente.
+
+Payload esperado: {"column_id": number, "order": number}
+
+DELETE /api/tasks/<id>
+
+Descrição: Remove permanentemente a tarefa especificada por ID do banco de dados SQLite.
+
+5.2. Diretrizes de Consumo no Flutter (KanbanService)
+Isolamento de Rede: Toda a lógica de comunicação externa será centralizada em uma classe de serviço chamada KanbanService, utilizando pacotes de requisição estáveis como o dio ou http.
+
+Ambiente Local: O aplicativo apontará para o IP 10.0.2.2:5000 durante os testes em emuladores Android para conseguir se conectar ao servidor Flask rodando no localhost do Docker.
+
+Atualização Otimista (Optimistic Update): Quando o usuário mover uma tarefa para outra lista de status ou alterar sua ordem, a interface gráfica do Flutter modificará instantaneamente a árvore de widgets na tela antes mesmo de aguardar a resposta do servidor. A requisição PATCH será enviada em segundo plano. Caso ocorra uma falha de rede ou rejeição pelo Flask, o Flutter reverterá o item para a posição anterior e exibirá um SnackBar alertando o usuário sobre o erro de sincronização.

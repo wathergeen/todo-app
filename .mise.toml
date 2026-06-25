@@ -1,0 +1,12 @@
+[tools]
+python = "3.12"
+flutter = "stable"
+just = "latest"
+
+[env]
+APP_ENV = "dev"
+_.python.venv = { path = ".venv", create = true }
+_.path = ["./.venv/bin"]
+
+[settings]
+experimental = true

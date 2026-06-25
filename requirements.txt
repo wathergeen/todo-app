@@ -1,0 +1,34 @@
+# ==============================================================================
+# requirements.txt — Backend Todo List (Flask)
+# Revisado para incluir o conjunto de dependências necessárias à suíte de testes
+# automatizados (TDD First). Mantém versionamento fixo para builds reprodutíveis
+# em Docker e CI/CD.
+# ==============================================================================
+
+# ---- Produção --------------------------------------------------------------
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Bcrypt==1.0.1
+Flask-JWT-Extended==4.6.0
+python-dotenv==1.0.1
+
+# ---- Testes / Qualidade (TDD) ----------------------------------------------
+# pytest: framework de testes (unitários e de integração)
+pytest==8.2.2
+
+# pytest-flask: fixtures (client, app context) idiomáticas para apps Flask
+pytest-flask==1.3.0
+
+# pytest-cov: relatório de cobertura integrado ao pytest, usado como gate no CI
+pytest-cov==5.0.0
+
+# pytest-mock: wrapper de unittest.mock como fixture (mocker), reduz boilerplate
+pytest-mock==3.14.0
+
+# freezegun: congela/controla datetime.utcnow() para testes determinísticos
+# de created_at / updated_at
+freezegun==1.5.1
+
+# factory-boy: factories para User/Column/Task, evita duplicação de fixtures
+# e dados de teste hardcoded
+factory-boy==3.3.0

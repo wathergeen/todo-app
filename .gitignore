@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+backend/instance/
+backend/todo.db
+backend/todo-*.db
+backend/.env
