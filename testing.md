@@ -1,7 +1,10 @@
-# Plano de Testes — Sistema Todo List (Backend Flask)
+# Plano de Testes — Sistema Todo List
 **Metodologia:** TDD First (Red → Green → Refactor)
-**Escopo:** `backend/` (API Flask + SQLAlchemy + SQLite). O front-end Flutter não é
-cobertor por este plano (suíte própria com `flutter_test`, fora do escopo deste documento).
+**Escopo:** backend Flask neste arquivo; frontend Flutter em `doc/testing.md`.
+
+Para testes de interface, responsividade, acessibilidade, renderização condicional,
+integração com APIs, E2E manual, regressão visual e estados de loading/skeleton/error,
+usar `doc/testing.md`.
 
 ---
 

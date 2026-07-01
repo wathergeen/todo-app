@@ -777,6 +777,78 @@ WIDGET RegisterView (ConsumerWidget):
 
 ---
 
+## 3. Refinamentos Obrigatórios de Interface {#interface}
+
+Os refinamentos abaixo não adicionam funcionalidades novas. Eles tornam explícito o
+comportamento visual e de renderização dos fluxos já definidos para autenticação,
+cadastro, board, criação, movimentação e exclusão de tarefas.
+
+### Estados de Tela
+- Login e cadastro devem exibir formulário centralizado, largura máxima de 420 px e
+  rolagem vertical quando a altura da tela for insuficiente.
+- Board deve exibir colunas em rolagem horizontal, com largura estável por coluna.
+- Quando `BoardState.isLoading == true` e `columns` estiver vazia, exibir loading
+  centralizado.
+- Quando `BoardState.isLoading == true` e `columns` já possuir dados, manter o board
+  visível e exibir feedback de atualização não bloqueante.
+- Quando `BoardState.error != null` e `columns` estiver vazia, exibir a mensagem de
+  erro e uma ação visual de retry que chame `fetchBoard()`.
+- Quando não houver colunas carregadas e não houver erro/loading, exibir estado vazio
+  informando que não há listas disponíveis.
+- Quando uma coluna não possuir tarefas, exibir estado vazio dentro da própria coluna.
+
+### Validações Visuais e Formulários
+- Login deve validar localmente antes de chamar o view model:
+  - usuário obrigatório;
+  - senha obrigatória.
+- Cadastro deve validar localmente antes de chamar o view model:
+  - usuário obrigatório;
+  - senha obrigatória.
+- Criação de tarefa deve validar localmente antes de chamar o view model:
+  - título obrigatório após `trim()`;
+  - coluna selecionada obrigatória, usando uma coluna existente do board.
+- Campos inválidos devem usar mensagens visuais próximas ao campo correspondente.
+- Durante `AuthState.isLoading`, botões de login, cadastro e navegação relacionada
+  devem ficar desabilitados e mostrar indicador de progresso no botão principal.
+
+### Mensagens de Erro, Timeout e Retry
+- Mensagens de erro vindas do backend devem continuar sendo normalizadas por
+  `friendlyErrorMessage`.
+- Erros de carregamento do board devem permitir retry explícito na tela.
+- Timeouts de rede devem ser exibidos como erro textual vindo da camada de serviço ou
+  normalização existente, sem alterar o contrato HTTP.
+- Falhas em movimentação ou exclusão otimista devem manter rollback local e SnackBar
+  com a mensagem já definida.
+
+### Acessibilidade e Padrões de Interação
+- Botões iconográficos devem possuir `tooltip` ou rótulo semântico equivalente.
+- Ações principais devem ser acessíveis por toque e teclado quando suportado pelo
+  Flutter/Material.
+- Mensagens de erro e estados vazios devem ser renderizados como texto real, não apenas
+  como cor ou ícone.
+- Cards de tarefa devem preservar leitura de título, descrição e data de atualização.
+- O drag-and-drop por long press permanece o padrão de movimentação; exclusão permanece
+  acessível pelo menu aberto por long press.
+
+### Responsividade e Consistência Visual
+- Telas de formulário devem manter margem interna mínima de 24 px.
+- Diálogos devem limitar largura para evitar expansão excessiva em telas grandes.
+- Textos de títulos, mensagens de erro e estados vazios devem quebrar linha dentro de
+  seus contêineres.
+- Colunas e cards devem preservar raio de borda de 8 px, seguindo o padrão atual.
+- O app deve continuar usando `ThemeData` Material 3 já definido em `main.dart`.
+
+### Integração Frontend/Backend e Renderização Condicional
+- Nenhum componente de interface deve chamar o backend diretamente; chamadas continuam
+  concentradas em `KanbanService` via view models.
+- Renderizações condicionais devem depender explicitamente de `isLoading`, `error` e
+  `columns`.
+- O botão de criação de tarefa deve ficar indisponível quando não houver colunas.
+- A UI deve manter compatibilidade com os payloads definidos em `/api/board`,
+  `/api/tasks`, `/api/login` e `/api/register`.
+
+---
+
 ## Resumo de Criação de Arquivos
 
 | Arquivo | Ação |
